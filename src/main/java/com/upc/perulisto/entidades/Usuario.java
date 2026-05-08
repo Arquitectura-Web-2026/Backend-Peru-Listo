@@ -1,4 +1,4 @@
-package com.upc.perulisto.entiidades;
+package com.upc.perulisto.entidades;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -24,8 +24,20 @@ public class Usuario {
     private String nombreCompleto;
     @Column(unique = true, nullable = false)
     private String correo;
-    private String password;
+    private String passwordHash;
+    private String role = "USER";
     private LocalDate fechaRegistro;
+
+    // Campos para recuperación de contraseña (HU-34)
+    private String resetToken;
+    private LocalDateTime resetTokenExpiry;
+
+    @PrePersist
+    public void prePersist() {
+        if (role == null) {
+            role = "USER";
+        }
+    }
 
     @JsonIgnore
     @OneToMany(mappedBy = "usuario")
