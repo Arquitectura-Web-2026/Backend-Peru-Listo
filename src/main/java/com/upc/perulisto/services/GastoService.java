@@ -52,5 +52,25 @@ public class GastoService {
         gastoRepository.deleteById(id);
     }
 
+    public List<GastoDTO> filtrarPorCategoria(Long categoriaId) {
+        return gastoRepository.findByCategoriaId(categoriaId).stream()
+                .map(g -> modelMapper.map(g, GastoDTO.class))
+                .toList();
+    }
+
+    public List<GastoDTO> filtrarPorFecha(LocalDate inicio, LocalDate fin) {
+        return gastoRepository.findByFechaGastoBetween(inicio, fin).stream()
+                .map(g -> modelMapper.map(g, GastoDTO.class))
+                .toList();
+    }
+
+
+
+
+
+
+
+
+
 
 }
