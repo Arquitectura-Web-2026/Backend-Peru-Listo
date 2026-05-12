@@ -39,7 +39,9 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Allow all requests for now - we'll secure them later
+                        // Admin endpoints require ADMIN role
+                        .requestMatchers("/API/admin/**").hasRole("ADMIN")
+                        // All other API endpoints are public (register, login, etc.)
                         .requestMatchers("/API/**").permitAll()
                         .anyRequest().permitAll()
                 );
