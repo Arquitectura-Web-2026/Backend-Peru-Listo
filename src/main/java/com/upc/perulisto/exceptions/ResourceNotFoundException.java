@@ -1,5 +1,3 @@
-
-
 package com.upc.perulisto.exceptions;
 
 import org.springframework.http.HttpStatus;

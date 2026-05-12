@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -33,9 +34,13 @@ public class Usuario {
     private LocalDateTime resetTokenExpiry;
 
     @PrePersist
+    @PreUpdate
     public void prePersist() {
         if (role == null) {
             role = "USER";
+        }
+        if (fechaRegistro == null) {
+            fechaRegistro = LocalDate.now();
         }
     }
 

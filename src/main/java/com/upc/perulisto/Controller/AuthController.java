@@ -7,6 +7,7 @@ import com.upc.perulisto.DTO.PasswordResetRequest;
 import com.upc.perulisto.entidades.Usuario;
 import com.upc.perulisto.repositorio.UsuarioRepository;
 import com.upc.perulisto.security.JwtUtils;
+import com.upc.perulisto.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,10 @@ public class AuthController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private UsuarioService usuarioService;
+
+    // HU-02: Inicio de sesión (JWT)
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -54,6 +59,7 @@ public class AuthController {
                 usuario.getRole()));
     }
 
+    // HU-01: Registro de nuevo usuario (alternativo vía Auth)
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody LoginRequest loginRequest) {
         if (usuarioRepository.existsByCorreo(loginRequest.getEmail())) {
@@ -70,16 +76,19 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("Usuario registrado exitosamente"));
     }
 
+    // HU-03: Cierre de sesión
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
         return ResponseEntity.ok(new MessageResponse("Sesión cerrada exitosamente"));
     }
 
+    // HU-06: Solicitar recuperación de contraseña
     @PostMapping("/solicitar_recuperacion")
     public ResponseEntity<?> solicitarRecuperacion(@RequestParam String correo) {
         return usuarioService.solicitarRecuperacion(correo);
     }
 
+    // HU-06: Restablecer contraseña con token
     @PostMapping("/restablecer_password")
     public ResponseEntity<?> restablecerPassword(@RequestParam String token, 
                                                   @RequestBody PasswordResetRequest request) {

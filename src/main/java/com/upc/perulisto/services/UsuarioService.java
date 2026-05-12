@@ -13,7 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,39 +27,6 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
-    public UsuarioDTO registrarUsuario(UsuarioDTO usuarioDTO) {
-        Usuario usuario = modelMapper.map(usuarioDTO, Usuario.class);
-
-        usuario = usuarioRepository.save(usuario);
-
-        return modelMapper.map(usuario, UsuarioDTO.class);
-
-    }
-
-    public List<UsuarioDTO> listarUsuarios() {
-        return usuarioRepository.findAll().stream()
-                .map(usuario-> modelMapper.map(usuario,UsuarioDTO.class))
-                .toList();
-    }
-
-    public UsuarioDTO editarUsuario(Long id, UsuarioDTO usuarioDTO) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        usuario.setNombreCompleto(usuarioDTO.getNombreCompleto());
-        usuario.setCorreo(usuarioDTO.getCorreo());
-
-        usuario = usuarioRepository.save(usuario);
-        return modelMapper.map(usuario, UsuarioDTO.class);
-    }
-
-    public void eliminarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado");
-        }
-        usuarioRepository.deleteById(id);
-    }
 
     public UsuarioDTO obtenerPerfil(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
