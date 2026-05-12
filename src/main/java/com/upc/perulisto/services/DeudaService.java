@@ -2,10 +2,14 @@ package com.upc.perulisto.services;
 
 
 import com.upc.perulisto.DTO.DeudaDTO;
-import com.upc.perulisto.entiidades.Deuda;
+import com.upc.perulisto.DTO.MessageResponse;
+import com.upc.perulisto.entidades.Deuda;
+import com.upc.perulisto.entidades.Usuario;
 import com.upc.perulisto.repositorio.DeudaRepository;
+import com.upc.perulisto.repositorio.UsuarioRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,10 +22,19 @@ public class DeudaService {
     private DeudaRepository deudaRepository;
 
     @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     public DeudaDTO registrarDeuda(DeudaDTO deudaDTO) {
+        // Validar que el usuario exista ANTES de guardar (evita quemar IDs)
+        Usuario usuario = usuarioRepository.findById(deudaDTO.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         Deuda deuda = modelMapper.map(deudaDTO, Deuda.class);
+        deuda.setUsuario(usuario);
+        deuda.setEstado("Pendiente");
         deuda = deudaRepository.save(deuda);
         return modelMapper.map(deuda, DeudaDTO.class);
     }
@@ -39,17 +52,28 @@ public class DeudaService {
         deuda.setAcreedor(deudaDTO.getAcreedor());
         deuda.setMonto(deudaDTO.getMonto());
         deuda.setFechaLimite(deudaDTO.getFechaLimite());
-        deuda.setEstado(deudaDTO.getEstado());
+        // NOTA: No se setea estado aquí — solo se cambia vía marcar_pagada (HU-16)
 
         deuda = deudaRepository.save(deuda);
         return modelMapper.map(deuda, DeudaDTO.class);
     }
 
-    public void eliminarDeuda(Long id) {
+    public ResponseEntity<?> eliminarDeuda(Long id) {
         if (!deudaRepository.existsById(id)) {
-            throw new RuntimeException("Deuda no encontrada");
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: Deuda no encontrada"));
         }
         deudaRepository.deleteById(id);
+        return ResponseEntity.ok(new MessageResponse("Deuda eliminada correctamente"));
+    }
+
+    public DeudaDTO marcarDeudaPagada(Long id) {
+        Deuda deuda = deudaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Deuda no encontrada"));
+
+        deuda.setEstado("pagada");
+        deuda = deudaRepository.save(deuda);
+        return modelMapper.map(deuda, DeudaDTO.class);
     }
 }
 

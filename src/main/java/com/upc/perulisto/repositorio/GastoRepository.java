@@ -1,27 +1,25 @@
 package com.upc.perulisto.repositorio;
 
-import com.upc.perulisto.entiidades.CategoriaGasto;
-import com.upc.perulisto.entiidades.Deuda;
-import com.upc.perulisto.entiidades.Gasto;
+import com.upc.perulisto.entidades.Gasto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface GastoRepository extends JpaRepository<Gasto, Long>  {
 
-    // 1. FILTRAR POR CATEGORIA
-    List<Gasto>  findByCategoriaId(Long categoriaId);
+    // HU-07: Listar gastos por usuario, ordenado por fecha descendente
+    List<Gasto> findByUsuarioIdOrderByFechaGastoDesc(Long usuarioId);
 
-    // 2. Filtrar por Rango de Fechas
-    List<Gasto> findByFechaGastoBetween(LocalDate inicio, LocalDate fin);
+    // HU-07: Listar gastos por usuario y rango de fechas
+    List<Gasto> findByUsuarioIdAndFechaGastoBetweenOrderByFechaGastoDesc(Long usuarioId, LocalDate fechaInicio, LocalDate fechaFin);
 
-    // 3. Filtrar por Método de Pago (Asumiendo que agregaste el campo 'metodoPago' a la entidad)
-   //List<Gasto> findByMetodoPago(String metodoPago);
+    // HU-19: Buscar gastos por descripción (case insensitive)
+    List<Gasto> findByUsuarioIdAndDescripcionContainingIgnoreCaseOrderByFechaGastoDesc(Long usuarioId, String descripcion);
 
-    // Filtro Combinado: Por Usuario y Rango de Fechas (Muy útil)
-    List<Gasto> findByUsuarioIdAndFechaGastoBetween(Long usuarioId, LocalDate inicio, LocalDate fin);
-
-
-
+    // HU-19: Buscar gastos por descripción y rango de fechas
+    List<Gasto> findByUsuarioIdAndDescripcionContainingIgnoreCaseAndFechaGastoBetweenOrderByFechaGastoDesc(
+            Long usuarioId, String descripcion, LocalDate fechaInicio, LocalDate fechaFin);
 }

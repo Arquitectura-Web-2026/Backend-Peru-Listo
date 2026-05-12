@@ -1,15 +1,13 @@
 package com.upc.perulisto.Controller;
 
+import com.upc.perulisto.DTO.CategoriaDTO;
 import com.upc.perulisto.DTO.GastoDTO;
+import com.upc.perulisto.services.CategoriaGastoService;
 import com.upc.perulisto.services.GastoService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -19,69 +17,69 @@ public class GastoController {
 
     @Autowired
     private GastoService gastoService;
-/*
+
+    @Autowired
+    private CategoriaGastoService categoriaGastoService;
+
+    // HU-06: Registro de gasto
     @PostMapping("/registrar_gasto")
     public GastoDTO registrarGasto(@RequestBody GastoDTO gastoDTO) {
         return gastoService.registrarGasto(gastoDTO);
     }
 
+    // HU-07: Listar gastos con filtro por mes/año
     @GetMapping("/listar_gastos")
-    public List<GastoDTO> listarGastos() {
-        return gastoService.listarGastos();
+    public List<GastoDTO> listarGastos(@RequestParam Long usuarioId,
+                                       @RequestParam(required = false) Integer mes,
+                                       @RequestParam(required = false) Integer anio) {
+        if (mes != null && anio != null) {
+            return gastoService.listarGastosPorMesYAnio(usuarioId, mes, anio);
+        }
+        return gastoService.listarGastosPorUsuario(usuarioId);
     }
 
+    // HU-19: Búsqueda de gastos
+    @GetMapping("/buscar_gastos")
+    public List<GastoDTO> buscarGastos(@RequestParam Long usuarioId,
+                                       @RequestParam String q,
+                                       @RequestParam(required = false) Integer mes,
+                                       @RequestParam(required = false) Integer anio) {
+        if (q.length() < 3) {
+            throw new RuntimeException("El término de búsqueda debe tener al menos 3 caracteres");
+        }
+        if (mes != null && anio != null) {
+            return gastoService.buscarGastosPorMesYAnio(usuarioId, q, mes, anio);
+        }
+        return gastoService.buscarGastosPorUsuario(usuarioId, q);
+    }
+
+    // HU-08: Editar gasto
     @PutMapping("/editar_gasto/{id}")
     public GastoDTO editarGasto(@PathVariable Long id, @RequestBody GastoDTO gastoDTO) {
         return gastoService.editarGasto(id, gastoDTO);
     }
 
+    // HU-09: Eliminar gasto
     @DeleteMapping("/eliminar_gasto/{id}")
-    public void eliminarGasto(@PathVariable Long id) {
-        gastoService.eliminarGasto(id);
+    public ResponseEntity<?> eliminarGasto(@PathVariable Long id) {
+        return gastoService.eliminarGasto(id);
     }
 
-*/
-     // 1. Registrar un gasto (Con @Valid para activar las validaciones)
-    @PostMapping("/registrar_gasto")
-    public ResponseEntity<GastoDTO> registrarGasto(@Valid @RequestBody GastoDTO gastoDTO) {
-        return new ResponseEntity<>(gastoService.registrarGasto(gastoDTO), HttpStatus.CREATED);
+    // ==================== HU-18: Gestión de categorías ====================
+
+    @GetMapping("/listar_categorias")
+    public List<CategoriaDTO> listarCategorias(@RequestParam Long usuarioId) {
+        return categoriaGastoService.listarCategoriasPorUsuario(usuarioId);
     }
 
-    // 2. Listar todos los gastos
-    @GetMapping("/ver_gastos")
-    public ResponseEntity<List<GastoDTO>> listarGastos() {
-        return ResponseEntity.ok(gastoService.listarGastos());
+    @PostMapping("/crear_categoria")
+    public CategoriaDTO crearCategoria(@RequestBody CategoriaDTO categoriaDTO) {
+        return categoriaGastoService.crearCategoria(categoriaDTO);
     }
 
-    // 3. Editar un gasto existente
-    @PutMapping("/modificar_gasto/{id}")
-    public ResponseEntity<GastoDTO> editarGasto(@PathVariable Long id, @Valid @RequestBody GastoDTO dto) {
-        return ResponseEntity.ok(gastoService.editarGasto(id, dto));
+    @DeleteMapping("/eliminar_categoria/{id}")
+    public ResponseEntity<?> eliminarCategoria(@PathVariable Long id, @RequestParam Long usuarioId) {
+        return categoriaGastoService.eliminarCategoria(id, usuarioId);
     }
-
-    // 4. Eliminar un gasto
-    @DeleteMapping("/eliminar_gasto/{id}")
-    public ResponseEntity<Void> eliminarGasto(@PathVariable Long id) {
-        gastoService.eliminarGasto(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // 5. Filtrar por Categoría
-    @GetMapping("/filtro/categoria")
-    public ResponseEntity<List<GastoDTO>> filtrarPorCategoria(@RequestParam Long id) {
-        return ResponseEntity.ok(gastoService.filtrarPorCategoria(id));
-    }
-
-    // 6. Filtrar por Rango de Fechas
-    @GetMapping("/filtro/fechas")
-    public ResponseEntity<List<GastoDTO>> filtrarPorFechas(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
-        return ResponseEntity.ok(gastoService.filtrarPorFecha(inicio, fin));
-    }
-
-
-
-
 
 }
