@@ -7,6 +7,7 @@ import com.upc.perulisto.DTO.PasswordResetRequest;
 import com.upc.perulisto.entidades.Usuario;
 import com.upc.perulisto.repositorio.UsuarioRepository;
 import com.upc.perulisto.security.JwtUtils;
+import com.upc.perulisto.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,8 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private UsuarioService usuarioService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {

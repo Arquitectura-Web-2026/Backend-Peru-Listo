@@ -1,6 +1,9 @@
 package com.upc.perulisto.entidades;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.upc.perulisto.entiidades.Deuda;
+import com.upc.perulisto.entiidades.Gasto;
+import com.upc.perulisto.entiidades.Ingreso;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

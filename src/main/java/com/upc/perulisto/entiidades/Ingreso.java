@@ -1,5 +1,6 @@
 package com.upc.perulisto.entiidades;
 
+import com.upc.perulisto.entidades.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
