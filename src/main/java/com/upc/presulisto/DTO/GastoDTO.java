@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Setter
@@ -20,7 +21,7 @@ public class GastoDTO {
     private String descripcion;
     private double monto;
     private LocalDate fechagasto;
-    private LocalTime fechacreacion;
+    private LocalDateTime fechacreacion;
 
 
     private Long usuarioId;

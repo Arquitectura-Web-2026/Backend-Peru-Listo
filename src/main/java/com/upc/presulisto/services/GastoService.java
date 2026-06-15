@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,7 +44,7 @@ public class GastoService {
         Gasto gasto = modelMapper.map(dto, Gasto.class);
         gasto.setUsuario(usuario);
         gasto.setCategoria(categoria);
-        gasto.setFechaCreacion(LocalTime.now());
+        gasto.setFechaCreacion(LocalDateTime.now());
         gasto = gastoRepository.save(gasto);
         return modelMapper.map(gasto, GastoDTO.class);
     }
@@ -88,13 +89,23 @@ public class GastoService {
     }
 
     public GastoDTO editarGasto(Long id, GastoDTO gastoDTO) {
+        // 1. Buscar el gasto existente en Postgres
         Gasto gasto = gastoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Gasto no encontrado"));
 
+        // 2. Actualizar las propiedades básicas
         gasto.setDescripcion(gastoDTO.getDescripcion());
         gasto.setMonto(gastoDTO.getMonto());
         gasto.setFechaGasto(gastoDTO.getFechagasto());
 
+        // 3. ¡SOLUCIÓN CRÍTICA! Buscar y asignar la nueva Categoría
+        if (gastoDTO.getCategoriaId() != null) {
+            CategoriaGasto nuevaCategoria = categoriaGastoRepository.findById(gastoDTO.getCategoriaId())
+                    .orElseThrow(() -> new RuntimeException("Categoría no encontrada con ID: " + gastoDTO.getCategoriaId()));
+            gasto.setCategoria(nuevaCategoria); // <--- Esto obliga a Hibernate a actualizar la columna "categoria_id"
+        }
+
+        // 4. Persistir los cambios en la BD
         gasto = gastoRepository.save(gasto);
         return modelMapper.map(gasto, GastoDTO.class);
     }

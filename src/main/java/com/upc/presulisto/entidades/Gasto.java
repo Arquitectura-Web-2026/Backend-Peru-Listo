@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -25,7 +26,7 @@ public class Gasto {
     private double monto;
     private LocalDate fechaGasto;
     private String descripcion;
-    private LocalTime fechaCreacion;
+    private LocalDateTime fechaCreacion;
 
     //  Relación con Usuario
     @ManyToOne
